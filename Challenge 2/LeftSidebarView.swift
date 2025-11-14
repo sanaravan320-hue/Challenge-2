@@ -5,7 +5,6 @@
 //  Created by Sana Ravan on 12/11/25.
 
 
-
 import SwiftUI
 import UIKit // We need this to create the custom slider
 
@@ -18,10 +17,12 @@ struct LeftSidebarView: View {
     @Binding var brushOpacity: Int
     @Binding var lines: [Line]
     @Binding var undoneLines: [Line]
+    @Binding var selectedColor: Color // <-- ADDED THIS
     
-    // --- 3. Local State for Keyboard ---
+    // --- 3. Local State for Keyboard & POPOVER ---
     @FocusState private var isSizeFieldFocused: Bool
     @FocusState private var isOpacityFieldFocused: Bool
+    @State private var isColorPickerShowing: Bool = false // <-- ADDED THIS
     
     // --- 4. Number Formatter for TextFields ---
     let numberFormatter: NumberFormatter = {
@@ -41,8 +42,6 @@ struct LeftSidebarView: View {
     private let toolButtonHeight: CGFloat = 30
     
     // --- Main View Body ---
-    // We break the body into smaller helper views
-    // to prevent the "compiler is unable to type-check" error.
     var body: some View {
         VStack(spacing: 8) { // This spacing controls the gap between groups
             
@@ -90,7 +89,6 @@ struct LeftSidebarView: View {
                 .foregroundColor(.white.opacity(0.8))
                 .frame(maxWidth: .infinity, alignment: .center)
             
-            // --- THIS IS THE NEW CUSTOM SLIDER ---
             CustomVerticalSlider(value: Binding(
                 get: { Double(brushSize) },
                 set: { brushSize = Int($0) }
@@ -148,7 +146,6 @@ struct LeftSidebarView: View {
                 .foregroundColor(.white.opacity(0.8))
                 .frame(maxWidth: .infinity, alignment: .center)
             
-            // --- THIS IS THE NEW CUSTOM SLIDER ---
             CustomVerticalSlider(value: Binding(
                 get: { Double(brushOpacity) },
                 set: { brushOpacity = Int($0) }
@@ -201,13 +198,23 @@ struct LeftSidebarView: View {
     @ViewBuilder
     private var toolAndHistoryButtons: some View {
         VStack(spacing: 12) {
-            Button(action: { print("Eyedropper tapped") }) {
+            
+            // --- THIS IS THE UPDATED BUTTON ---
+            Button(action: {
+                isColorPickerShowing.toggle() // 1. This toggles the popover
+            }) {
                 Image(systemName: "eyedropper")
                     .font(.system(size: toolButtonSize))
                     .frame(width: 40, height: toolButtonHeight)
                     .foregroundColor(.white)
             }
             .padding(.top, 8) // Add a little space before tools
+            // 2. This modifier presents the popover
+            .popover(isPresented: $isColorPickerShowing, arrowEdge: .leading) {
+                ColorPicker("Select Color", selection: $selectedColor, supportsOpacity: true)
+                    .labelsHidden()
+                    .padding()
+            }
             
             // --- UNDO BUTTON ---
             Button(action: {
@@ -269,11 +276,12 @@ private struct CustomVerticalSlider: UIViewRepresentable {
     // Create the small thumb image one time
     private static let thumbImage: UIImage = {
         let image = Image(systemName: "circle.fill")
-            .font(.system(size: 15)) // <-- I changed this from 12 to 15
+            .font(.system(size: 15)) // Using the 15pt thumb
             .foregroundColor(.white)
         
         let renderer = ImageRenderer(content: image)
-        return renderer.uiImage ?? UIImage()
+        // force unwrap is safe here as we're creating a simple system image
+        return renderer.uiImage!
     }()
     
     // 1. Create the UIKit UISlider
@@ -293,14 +301,14 @@ private struct CustomVerticalSlider: UIViewRepresentable {
         
         slider.addTarget(
             context.coordinator,
-            action: #selector(Coordinator.valueChanged(_:)),
+            action: #selector(Coordinator.valueChanged(_:)), // <-- Fixed
             for: .valueChanged
         )
         return slider
     }
     
     // 2. Update the slider when the @Binding changes
-    func updateUIView(_ uiView: UISlider, context: Context) {
+    func updateUIView(_ uiView: UISlider, context: Context) { // <-- Fixed
         uiView.value = Float(self.value)
     }
     
@@ -309,6 +317,7 @@ private struct CustomVerticalSlider: UIViewRepresentable {
         Coordinator(value: $value)
     }
     
+    // --- THIS CLASS IS NOW CORRECT ---
     class Coordinator: NSObject {
         var value: Binding<Double>
         
@@ -316,6 +325,7 @@ private struct CustomVerticalSlider: UIViewRepresentable {
             self.value = value
         }
         
+        // --- THIS FUNCTION WAS MISSING ---
         @objc func valueChanged(_ sender: UISlider) {
             self.value.wrappedValue = Double(sender.value)
         }
@@ -329,7 +339,8 @@ struct LeftSidebarView_Previews: PreviewProvider {
             brushSize: .constant(40),
             brushOpacity: .constant(87),
             lines: .constant([]),
-            undoneLines: .constant([])
+            undoneLines: .constant([]),
+            selectedColor: .constant(.black) // <-- ADDED THIS
         )
         .background(Color.gray)
     }

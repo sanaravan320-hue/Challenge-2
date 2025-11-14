@@ -15,10 +15,12 @@ enum Tool {
 }
 
 // --- 2. Define a data structure for a single line ---
+// I've fixed this struct to store opacity and width separately.
 struct Line {
     var points: [CGPoint] = []
-    var color: Color = .black // This will now be set by selectedColor
-    var lineWidth: Double = 1.0
+    var color: Color = .black
+    var lineWidth: Double = 1.0 // This is for Brush Size
+    var opacity: Double = 1.0   // This is for Brush Opacity
     var tool: Tool = .brush
 }
 
@@ -29,8 +31,7 @@ struct ContentView: View {
     @State private var brushOpacity: Int = 87
     @State private var selectedTool: Tool = .brush
     
-    // --- THIS IS THE NEW VARIABLE ---
-    @State private var selectedColor: Color = .black // The default color is black
+    @State private var selectedColor: Color = .black
     
     // --- 4. Drawing State ---
     @State private var lines: [Line] = []
@@ -50,12 +51,12 @@ struct ContentView: View {
                     var path = Path()
                     path.addLines(line.points)
                     
-                    // --- Eraser logic is still here ---
                     let drawColor = (line.tool == .eraser) ? Color.white : line.color
                     
+                    // --- This now correctly uses saved opacity and width ---
                     context.stroke(path,
-                                   with: .color(drawColor.opacity(line.lineWidth / 100.0)), // Use line's saved opacity
-                                   style: StrokeStyle(lineWidth: Double(line.lineWidth), lineCap: .round, lineJoin: .round))
+                                   with: .color(drawColor.opacity(line.opacity)),
+                                   style: StrokeStyle(lineWidth: line.lineWidth, lineCap: .round, lineJoin: .round))
                 }
                 
                 // This draws the line we are currently drawing
@@ -65,8 +66,14 @@ struct ContentView: View {
                 // --- Use the main state variables for the current line ---
                 let currentDrawColor = (selectedTool == .eraser) ? Color.white : selectedColor
                 
+                // --- THIS IS THE NEW SMUDGE LOGIC ---
+                var currentDrawOpacity = Double(brushOpacity) / 100.0
+                if selectedTool == .smudge {
+                    currentDrawOpacity = 0.1 // Fixed 10% opacity for smudge
+                }
+                
                 context.stroke(path,
-                               with: .color(currentDrawColor.opacity(Double(brushOpacity) / 100.0)),
+                               with: .color(currentDrawColor.opacity(currentDrawOpacity)), // <-- Use the new opacity
                                style: StrokeStyle(lineWidth: Double(brushSize), lineCap: .round, lineJoin: .round))
                 
             }
@@ -77,16 +84,22 @@ struct ContentView: View {
                         
                         // --- Set properties for the new line ---
                         currentLine.tool = selectedTool
-                        currentLine.lineWidth = Double(brushOpacity) // <-- FIX: Link to opacity
-                        currentLine.color = selectedColor // <-- FIX: Use the selected color
+                        currentLine.color = selectedColor // <-- Use the selected color
                         currentLine.points.append(newPoint)
                         
                         undoneLines.removeAll()
                     })
                     .onEnded({ value in
-                        // --- Store the final line width ---
-                        // We store brushSize, not brushOpacity, for the line's width
+                        // --- Store the final line width and opacity ---
                         currentLine.lineWidth = Double(brushSize)
+                        
+                        // --- THIS IS THE NEW SMUDGE LOGIC ---
+                        if selectedTool == .smudge {
+                            currentLine.opacity = 0.1 // Save smudge lines at 10%
+                        } else {
+                            currentLine.opacity = Double(brushOpacity) / 100.0
+                        }
+                        
                         lines.append(currentLine)
                         currentLine = Line()
                     })
@@ -116,7 +129,8 @@ struct ContentView: View {
                     brushSize: $brushSize,
                     brushOpacity: $brushOpacity,
                     lines: $lines,
-                    undoneLines: $undoneLines
+                    undoneLines: $undoneLines,
+                    selectedColor: $selectedColor // <-- ADD THIS NEW BINDING
                 )
                 
                 Spacer()
