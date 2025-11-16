@@ -58,15 +58,14 @@ struct TopRightPillView: View {
                     .foregroundColor(.white)
             }
             
-            // --- 2. THIS IS THE NEW COLOR PICKER ---
-            ColorPicker("", selection: $selectedColor) // The "" label makes it icon-only
+            ColorPicker("", selection: $selectedColor)
                 .labelsHidden() // Hides the label
                 .frame(width: 50, height: 44)
-                .padding(.horizontal, 4) // Give it a little space inside the pill
+                .padding(.horizontal, 4)
 
         } // End of HStack
-        .padding(.leading, 6) // Add padding to the start
-        // We remove .padding(.horizontal) to let the ColorPicker's padding work
+        .padding(.leading, 6)
+        
         .background(
             .ultraThinMaterial.opacity(0.8)
         )
@@ -79,10 +78,8 @@ struct TopRightPillView: View {
     }
 }
 
-// --- This Preview is for this file ONLY ---
 struct TopRightPillView_Previews: PreviewProvider {
     static var previews: some View {
-        // We must add the new binding to the preview
         TopRightPillView(
             selectedTool: .constant(.brush),
             selectedColor: .constant(.black)
