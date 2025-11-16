@@ -6,12 +6,12 @@
 
 
 import SwiftUI
-import UIKit // We need this to create the custom slider
+import UIKit
 
-// --- 1. Make sure the struct name matches ---
+
 struct LeftSidebarView: View {
     
-    // --- 2. @Binding Variables ---
+    // @Binding Variables
     // These connect to ContentView's @State
     @Binding var brushSize: Int
     @Binding var brushOpacity: Int
@@ -19,12 +19,12 @@ struct LeftSidebarView: View {
     @Binding var undoneLines: [Line]
     @Binding var selectedColor: Color // <-- ADDED THIS
     
-    // --- 3. Local State for Keyboard & POPOVER ---
+    //Local State for Keyboard & POPOVER
     @FocusState private var isSizeFieldFocused: Bool
     @FocusState private var isOpacityFieldFocused: Bool
     @State private var isColorPickerShowing: Bool = false // <-- ADDED THIS
     
-    // --- 4. Number Formatter for TextFields ---
+    // Number Formatter for TextFields
     let numberFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .none
@@ -33,7 +33,7 @@ struct LeftSidebarView: View {
         return formatter
     }()
     
-    // --- 5. Style constants for the compact look ---
+    // Style constants for the compact look
     private let sidebarWidth: CGFloat = 70
     private let stepperHeight: CGFloat = 28
     private let stepperFontSize: CGFloat = 13
@@ -41,23 +41,23 @@ struct LeftSidebarView: View {
     private let toolButtonSize: CGFloat = 17
     private let toolButtonHeight: CGFloat = 30
     
-    // --- Main View Body ---
+    //Main View Body
     var body: some View {
         VStack(spacing: 8) { // This spacing controls the gap between groups
             
-            // --- First Group ---
+            //First Group
             sizeControls
             
-            // --- Second Group ---
+            //Second Group
             opacityControls
             
-            // --- Third Group ---
+            //Third Group
             toolAndHistoryButtons
             
         } // End of main VStack
         .padding(.vertical, 16) // Padding at the very top and bottom
         .padding(.horizontal, 6)
-        .frame(width: sidebarWidth) // Set the final, compact width
+        .frame(width: sidebarWidth)
         .background(.ultraThinMaterial.opacity(0.8)) // Liquid Glass effect
         .cornerRadius(sidebarWidth / 2) // Perfect pill shape
         .overlay(
@@ -67,7 +67,7 @@ struct LeftSidebarView: View {
         // This pushes the pill to the center vertically
         .frame(maxHeight: .infinity, alignment: .center)
         
-        // --- This adds the "Done" button to the keyboard ---
+        //This adds the "Done" button to the keyboard
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
@@ -80,7 +80,7 @@ struct LeftSidebarView: View {
         }
     }
     
-    // --- HELPER VIEW for Size Controls ---
+    //HELPER VIEW for Size Controls
     @ViewBuilder
     private var sizeControls: some View {
         VStack(spacing: 6) { // Tighter spacing for this sub-group
@@ -137,7 +137,7 @@ struct LeftSidebarView: View {
         } // End of Size VStack
     }
     
-    // --- HELPER VIEW for Opacity Controls ---
+ 
     @ViewBuilder
     private var opacityControls: some View {
         VStack(spacing: 6) {
@@ -194,29 +194,28 @@ struct LeftSidebarView: View {
         } // End of Opacity VStack
     }
     
-    // --- HELPER VIEW for Tool & History Buttons ---
+   
     @ViewBuilder
     private var toolAndHistoryButtons: some View {
         VStack(spacing: 12) {
-            
-            // --- THIS IS THE UPDATED BUTTON ---
+         
             Button(action: {
-                isColorPickerShowing.toggle() // 1. This toggles the popover
+                isColorPickerShowing.toggle() //
             }) {
                 Image(systemName: "eyedropper")
                     .font(.system(size: toolButtonSize))
                     .frame(width: 40, height: toolButtonHeight)
                     .foregroundColor(.white)
             }
-            .padding(.top, 8) // Add a little space before tools
-            // 2. This modifier presents the popover
+            .padding(.top, 8) // Adds a little space before tools
+            
             .popover(isPresented: $isColorPickerShowing, arrowEdge: .leading) {
                 ColorPicker("Select Color", selection: $selectedColor, supportsOpacity: true)
                     .labelsHidden()
                     .padding()
             }
             
-            // --- UNDO BUTTON ---
+            //UNDO BUTTON
             Button(action: {
                 if let lastLine = lines.popLast() {
                     undoneLines.append(lastLine)
@@ -229,7 +228,7 @@ struct LeftSidebarView: View {
             }
             .disabled(lines.isEmpty)
             
-            // --- REDO BUTTON ---
+            //REDO BUTTON
             Button(action: {
                 if let lastUndoneLine = undoneLines.popLast() {
                     lines.append(lastUndoneLine)
@@ -244,8 +243,7 @@ struct LeftSidebarView: View {
             
         } // End of Tools VStack
     }
-    
-    // --- Helper Functions ---
+  
     
     func clampValues() {
         if brushSize > 100 { brushSize = 100 }
@@ -268,19 +266,17 @@ struct LeftSidebarView: View {
     }
 }
 
-// --- THIS IS THE CUSTOM SLIDER THAT FIXES THE "LINKED" BUG ---
+
 private struct CustomVerticalSlider: UIViewRepresentable {
     @Binding var value: Double
     var `in`: ClosedRange<Double>
     
-    // Create the small thumb image one time
     private static let thumbImage: UIImage = {
         let image = Image(systemName: "circle.fill")
             .font(.system(size: 15)) // Using the 15pt thumb
             .foregroundColor(.white)
         
         let renderer = ImageRenderer(content: image)
-        // force unwrap is safe here as we're creating a simple system image
         return renderer.uiImage!
     }()
     
@@ -292,32 +288,29 @@ private struct CustomVerticalSlider: UIViewRepresentable {
         slider.value = Float(self.value)
         slider.tintColor = UIColor.white.withAlphaComponent(0.5)
         
-        // --- THIS IS THE FIX ---
-        // We set the thumb image on *this specific slider*,
-        // not on the global "appearance()"
+
         slider.setThumbImage(Self.thumbImage, for: .normal)
         
         slider.transform = CGAffineTransform(rotationAngle: -(.pi / 2)) // Rotate it
         
         slider.addTarget(
             context.coordinator,
-            action: #selector(Coordinator.valueChanged(_:)), // <-- Fixed
+            action: #selector(Coordinator.valueChanged(_:)),
             for: .valueChanged
         )
         return slider
     }
     
     // 2. Update the slider when the @Binding changes
-    func updateUIView(_ uiView: UISlider, context: Context) { // <-- Fixed
+    func updateUIView(_ uiView: UISlider, context: Context) {
         uiView.value = Float(self.value)
     }
-    
-    // 3. Create a Coordinator to send data *back* to SwiftUI
+   
     func makeCoordinator() -> Coordinator {
         Coordinator(value: $value)
     }
     
-    // --- THIS CLASS IS NOW CORRECT ---
+    //
     class Coordinator: NSObject {
         var value: Binding<Double>
         
@@ -325,14 +318,14 @@ private struct CustomVerticalSlider: UIViewRepresentable {
             self.value = value
         }
         
-        // --- THIS FUNCTION WAS MISSING ---
+        //
         @objc func valueChanged(_ sender: UISlider) {
             self.value.wrappedValue = Double(sender.value)
         }
     }
 }
 
-// --- PREVIEW ---
+
 struct LeftSidebarView_Previews: PreviewProvider {
     static var previews: some View {
         LeftSidebarView(
@@ -340,7 +333,7 @@ struct LeftSidebarView_Previews: PreviewProvider {
             brushOpacity: .constant(87),
             lines: .constant([]),
             undoneLines: .constant([]),
-            selectedColor: .constant(.black) // <-- ADDED THIS
+            selectedColor: .constant(.black) 
         )
         .background(Color.gray)
     }

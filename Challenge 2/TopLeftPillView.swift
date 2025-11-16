@@ -8,15 +8,12 @@
 import SwiftUI
 
 struct TopLeftPillView: View {
-    // 1. ADD THIS ACTION
-    // This will be a "closure" (a function) passed in from ContentView
     var saveAction: () -> Void
     
     var body: some View {
-        // We use an HStack to hold the Back button and the tools pill
+   
         HStack {
-            
-            // 1. This is the standalone Back Button
+     
             Button(action: {
                 print("Back to Gallery tapped")
             }) {
@@ -32,10 +29,8 @@ struct TopLeftPillView: View {
                     )
             }
             
-            // 2. This is the main "Actions" pill
             HStack(spacing: 0) {
-                
-                // --- THIS IS YOUR FINAL ORDER ---
+            
                 
                 // Transform Button (Arrow)
                 Button(action: { print("Transform tapped") }) {
@@ -53,7 +48,7 @@ struct TopLeftPillView: View {
                         .foregroundColor(.white)
                 }
 
-                // Adjustments Button (Your choice)
+                // Adjustments Button
                 Button(action: { print("Adjustments tapped") }) {
                     Image(systemName: "slider.horizontal.3")
                         .font(.system(size: 20))
@@ -101,7 +96,6 @@ struct TopLeftPillView: View {
 
 struct TopLeftPillView_Previews: PreviewProvider {
     static var previews: some View {
-        // 3. Update the preview to pass in an empty action
         TopLeftPillView(saveAction: {})
             .background(Color.gray)
     }

@@ -6,17 +6,17 @@
 //
 
 import SwiftUI
-import PhotosUI // <-- 1. IMPORT FOR SAVING TO PHOTOS
+import PhotosUI // (Import for saving to photos)
 
-// --- 1. Define our Tool ---
+// Define Tool
 enum Tool {
     case brush
     case smudge
     case eraser
 }
 
-// --- 2. Define a data structure for a single line ---
-// (We've added 'opacity' to fix the smudge/opacity bug)
+// Define a data structure for a single line
+
 struct Line {
     var points: [CGPoint] = []
     var color: Color = .black
@@ -27,22 +27,19 @@ struct Line {
 
 struct ContentView: View {
     
-    // --- 3. State Variables ---
+    // State Variables
     @State private var brushSize: Int = 40
     @State private var brushOpacity: Int = 87
     @State private var selectedTool: Tool = .brush
     @State private var selectedColor: Color = .black
     
-    // --- 4. Drawing State ---
+    // Drawing State
     @State private var lines: [Line] = []
     @State private var undoneLines: [Line] = []
     @State private var currentLine = Line()
-    
-    // --- 5. NEW STATE FOR SAVE ALERT ---
     @State private var showSavedAlert = false
     
-    // --- 6. CANVAS RENDERER ---
-    // This allows us to snapshot the canvas for saving
+    // CANVAS RENDERER
     @State private var canvasRect: CGRect = .zero
     
     var body: some View {
@@ -52,11 +49,9 @@ struct ContentView: View {
             Color(red: 0.2, green: 0.2, blue: 0.2)
                 .edgesIgnoringSafeArea(.all)
 
-            // --- 7. THE CANVAS ---
-            // We wrap the Canvas in a GeometryReader to find its size
+            //THE CANVAS
             GeometryReader { geometry in
                 Canvas { context, size in
-                    // Draw all the finished lines
                     for line in lines {
                         var path = Path()
                         path.addLines(line.points)
@@ -68,11 +63,8 @@ struct ContentView: View {
                                        style: StrokeStyle(lineWidth: line.lineWidth, lineCap: .round, lineJoin: .round))
                     }
                     
-                    // This draws the line we are currently drawing
                     var path = Path()
                     path.addLines(currentLine.points)
-                    
-                    // --- Use the main state variables for the current line ---
                     let currentDrawColor = (selectedTool == .eraser) ? Color.white : selectedColor
                     let currentOpacity = (selectedTool == .smudge) ? 0.1 : (Double(brushOpacity) / 100.0)
                     
@@ -86,10 +78,9 @@ struct ContentView: View {
                         .onChanged({ value in
                             let newPoint = value.location
                             
-                            // --- Set properties for the new line ---
                             currentLine.tool = selectedTool
-                            currentLine.lineWidth = Double(brushSize) // Corrected
-                            currentLine.opacity = (selectedTool == .smudge) ? 0.1 : (Double(brushOpacity) / 100.0) // Corrected
+                            currentLine.lineWidth = Double(brushSize)
+                            currentLine.opacity = (selectedTool == .smudge) ? 0.1 : (Double(brushOpacity) / 100.0)
                             currentLine.color = selectedColor
                             currentLine.points.append(newPoint)
                             
@@ -100,7 +91,7 @@ struct ContentView: View {
                             currentLine = Line()
                         })
                 )
-                // This preference key stores the canvas's size and position
+              
                 .background(
                     GeometryReader { geo in
                         Color.clear.preference(key: CanvasRectKey.self, value: geo.frame(in: .global))
@@ -117,10 +108,9 @@ struct ContentView: View {
             }
             
             
-            // --- 8. THE UI LAYER ---
+            //THE UI LAYER
             VStack(spacing: 0) {
                 HStack {
-                    // --- PASS THE NEW SAVE ACTION ---
                     TopLeftPillView(saveAction: saveCanvasAsImage)
                     
                     Spacer()
@@ -133,7 +123,7 @@ struct ContentView: View {
             .padding()
             
             HStack {
-                // --- PASS ALL BINDINGS ---
+                
                 LeftSidebarView(
                     brushSize: $brushSize,
                     brushOpacity: $brushOpacity,
@@ -147,7 +137,7 @@ struct ContentView: View {
             .padding()
 
         } // End of ZStack
-        // --- 9. "SAVED!" ALERT ---
+        // 
         .alert("Saved!", isPresented: $showSavedAlert) {
             Button("OK", role: .cancel) { }
         } message: {
@@ -155,14 +145,12 @@ struct ContentView: View {
         }
     }
     
-    // --- 10. NEW SAVE FUNCTION ---
+    // NEW SAVE FUNCTION
     @MainActor
     func saveCanvasAsImage() {
-        // This is a "snapshot" of the Canvas view
         let renderer = ImageRenderer(
             content:
                 Canvas { context, size in
-                    // We must redraw all lines here for the snapshot
                     for line in lines {
                         var path = Path()
                         path.addLines(line.points)

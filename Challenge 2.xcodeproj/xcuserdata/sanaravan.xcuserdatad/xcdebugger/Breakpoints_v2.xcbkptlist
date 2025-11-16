@@ -14,27 +14,13 @@
             filePath = "Challenge 2/ContentView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "113"
-            endingLineNumber = "113"
+            startingLineNumber = "104"
+            endingLineNumber = "104"
             landmarkName = "body"
             landmarkType = "24">
             <Locations>
                <Location
-                  uuid = "AFB72B87-A02C-484A-AE9F-BA6415DFCF09 - c5bf51791e9fe1e6"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Challenge_2.ContentView.body.getter : some"
-                  moduleName = "Challenge 2.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/sanaravan/Documents/Challenge%202/Challenge%202/ContentView.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "151"
-                  endingLineNumber = "151">
-               </Location>
-               <Location
-                  uuid = "AFB72B87-A02C-484A-AE9F-BA6415DFCF09 - b4f8e099335787e6"
+                  uuid = "AFB72B87-A02C-484A-AE9F-BA6415DFCF09 - b4f8e09933578787"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -44,8 +30,22 @@
                   urlString = "file:///Users/sanaravan/Documents/Challenge%202/Challenge%202/ContentView.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "113"
-                  endingLineNumber = "113">
+                  startingLineNumber = "114"
+                  endingLineNumber = "114">
+               </Location>
+               <Location
+                  uuid = "AFB72B87-A02C-484A-AE9F-BA6415DFCF09 - 4fc4c4df6d7f2bf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 (__C.CGRect) -&gt; () in closure #1 () -&gt; SwiftUI.TupleView&lt;(&lt;&lt;opaque return type of SwiftUI.View.edgesIgnoringSafeArea(SwiftUI.Edge.Set) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.onPreferenceChange&lt;&#x3c4;_0_0 where &#x3c4;_1_0: SwiftUI.PreferenceKey, &#x3c4;_1_0.Value: Swift.Equatable&gt;(_: &#x3c4;_1_0.Type, perform: (&#x3c4;_1_0.Value) -&gt; ()) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.padding(SwiftUI.Edge.Set, Swift.Optional&lt;CoreGraphics.CGFloat&gt;) -&gt; some&gt;&gt;.0, &lt;&lt;opaque return type of SwiftUI.View.padding(SwiftUI.Edge.Set, Swift.Optional&lt;CoreGraphics.CGFloat&gt;) -&gt; some&gt;&gt;.0)&gt; in Challenge_2.ContentView.body.getter : some"
+                  moduleName = "Challenge 2.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/sanaravan/Documents/Challenge%202/Challenge%202/ContentView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "115"
+                  endingLineNumber = "115">
                </Location>
             </Locations>
          </BreakpointContent>
